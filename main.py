@@ -6,11 +6,12 @@ from docx import Document
 def read_pdf_text(filename):
     pdf_text = ""
     with open(filename, 'rb') as file:
-        reader = PyPDF4.PdfReader(file)
-        for page_num in range(len(reader.pages)):
-            page = reader.pages[page_num]
-            pdf_text += page.extract_text()
+        reader = PyPDF4.PdfFileReader(file)  # Correção aqui: PdfFileReader, não PdfReader.
+        for page_num in range(reader.numPages):
+            page = reader.getPage(page_num)
+            pdf_text += page.extractText()
     return pdf_text
+
 
 def translate_text(text, target_lang='pt'):
     translator = Translator(to_lang=target_lang)
@@ -51,6 +52,12 @@ if __name__ == "__main__":
 
         # Criar o resumo em um arquivo de texto
         create_summary_txt(translated_text, output_txt)
+
+        print(f"Resumo traduzido criado com sucesso e salvo em '{output_docx}' e '{output_txt}'.")
+    except FileNotFoundError:
+        print(f"O arquivo '{pdf_filename}' não foi encontrado.")
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
 
         print(f"Resumo traduzido criado com sucesso e salvo em '{output_docx}' e '{output_txt}'.")
     except FileNotFoundError:
